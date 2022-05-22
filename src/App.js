@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import { firestore } from "./API/firebase";
 
-function App() {
+import "./App.css";
+import Images from "./components/Images";
+import NavbarComponent from "./components/Navbar";
+import SearchBar from "./components/SearchBar";
+
+const App = () => {
+  const [images, setImages] = useState([]);
+  const [allImages, setAllImages] = useState([]);
+
+  useEffect(() => {
+    firestore
+      .collection("images")
+      .get()
+      .then((images) => {
+        const allImages = [];
+        images.forEach((img) => {
+          allImages.push({ data: img.data(), id: img.id });
+        });
+
+        setAllImages(allImages);
+        setImages(allImages);
+      });
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <div>
+    
+      <NavbarComponent
+        images={allImages}
+        setImages={setImages}
+        setAllImages={setAllImages}
+      />
+       <SearchBar images={allImages} setImages={setImages} /> 
+      <Images
+        images={images}
+        allImages={allImages}
+        setAllImages={setAllImages}
+        setImages={setImages}
+      />
+      </div>
+  )
 }
 
 export default App;
